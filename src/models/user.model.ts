@@ -8,6 +8,7 @@ export interface UserDocument extends mongoose.Document {
     password: string;
     createdAt: Date;
     updatedAt: Date;
+    comparePassword(candiatePassword: string): Promise<boolean>;
 }
 
 const userSchema = new mongoose.Schema(
@@ -21,7 +22,8 @@ const userSchema = new mongoose.Schema(
     }
 );
 
-userSchema.pre("save", async (next: (err?: Error) => void) => {
+// You get an error because the arrow function changes the scope of 'this.' Have to use function keyword for 'this' to work.
+userSchema.pre("save", async function (next) {
     let user = this as unknown as UserDocument;
 
     // if the pre save is not modifying the password, return next
