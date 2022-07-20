@@ -10,5 +10,3 @@ Middleware, requireUser, checks if there is a user making the request.
 Middleware, deserializeUser, takes the accessToken and verifies it. If it is valid, it takes the decoded object and sets the res.locals.user as the object. If the accessToken is expired, it checks the refreshToken. If the refreshToken is valid it assigns and sets a new accessToken.
 In the utils folder there is a file for jwt functions, signJwt, and verifyJwt.
 Utils also contains a logger file which is used to log information to the console instead of using console.log.
-
-use 201 to create a new user, create sessions
