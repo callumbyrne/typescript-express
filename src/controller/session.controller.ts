@@ -7,6 +7,7 @@ import {
 import { validatePassword } from "../service/user.service";
 import { signJwt } from "../utils/jwt.utils";
 import config from "config";
+import logger from "../utils/logger";
 
 export async function createUserSessionHandler(req: Request, res: Response) {
     // Validate the user's password
@@ -18,6 +19,8 @@ export async function createUserSessionHandler(req: Request, res: Response) {
     // create a session
     const session = await createSession(user._id, req.get("user-agent") || "");
     // create an access token
+    // signJwt gives the accessToken the user object and adds on a session property
+    // User + session object is added to res.locals.user in the deserializeUser middleware which allows controllers to acces user id and session id
     const accessToken = signJwt(
         { ...user, session: session._id },
         { expiresIn: config.get("accessTokenTtl") } // 15min
@@ -29,24 +32,34 @@ export async function createUserSessionHandler(req: Request, res: Response) {
     );
 
     // return access & refresh tokens
-    return res.send({ accessToken, refreshToken });
+    return res.status(201).send({ accessToken, refreshToken });
 }
 
 export async function getUserSessionsHandler(req: Request, res: Response) {
-    const userId = res.locals.user._id;
+    try {
+        const userId = res.locals.user._id;
+        const sessions = await findSessions({ user: userId, valid: true });
 
-    const sessions = await findSessions({ user: userId, valid: true });
-
-    return res.send(sessions);
+        return res.status(200).send(sessions);
+    } catch (error) {
+        logger.error(error);
+        return res.status(500).json({ error });
+    }
 }
 
 export async function deleteSessionHandler(req: Request, res: Response) {
-    const sessionId = res.locals.user.session;
+    try {
+        const sessionId = res.locals.user.session;
+        const updatedSession = await updateSession(
+            { _id: sessionId },
+            { valid: false }
+        );
 
-    await updateSession({ _id: sessionId }, { valid: false });
-
-    return res.send({
-        accessToken: null,
-        refreshToken: null,
-    });
+        return updatedSession
+            ? res.status(201).send({ accessToken: null, refreshToken: null })
+            : res.status(404).json({ message: "Not found" });
+    } catch (error) {
+        logger.error(error);
+        return res.status(500).json({ error });
+    }
 }
