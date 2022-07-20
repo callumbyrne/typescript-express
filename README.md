@@ -11,11 +11,4 @@ Middleware, deserializeUser, takes the accessToken and verifies it. If it is val
 In the utils folder there is a file for jwt functions, signJwt, and verifyJwt.
 Utils also contains a logger file which is used to log information to the console instead of using console.log.
 
-For me to consider:
-DocumentDefinition<Omit<UserDocument,"createdAt" | "updatedAt" | "comparePassword">>
-Im wondering (I havent tried it out), is it possible to have a "interface without the timestamps and functions" and a "interface for the schema"? Does this somehow make sense, or would this lead to a bad code-design?
-Leading to something like:
-export interface UserDocumentBase extends mongoose.Document{documentDetails}
-export interface UserDocument extends mongoose.Document, UserDocumentBase {additionalDocumentDetails} (maybe we dont need the additional extends mongoose.Document)
-
 use 201 to create a new user, create sessions
