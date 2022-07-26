@@ -15,6 +15,7 @@ export interface ProductInput {
 export interface ProductDocument extends ProductInput, mongoose.Document {
     createdAt: Date;
     updatedAt: Date;
+    productId: string;
 }
 
 const productSchema = new mongoose.Schema(
