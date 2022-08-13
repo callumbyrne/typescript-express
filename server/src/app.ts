@@ -2,6 +2,7 @@ import express from "express";
 import logger from "./utils/logger";
 import cors from "cors";
 import config from "config";
+import cookieParser from "cookie-parser";
 
 import deserializeUser from "./middleware/deserializeUser";
 
@@ -20,6 +21,7 @@ app.use(
         credentials: true,
     })
 );
+app.use(cookieParser());
 app.use(express.json());
 app.use(deserializeUser);
 
