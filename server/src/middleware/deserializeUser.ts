@@ -15,10 +15,6 @@ const deserializeUser = async (
     const refreshToken =
         get(req, "cookies.refreshToken") || get(req, "headers.x-refresh");
 
-    if (!accessToken) {
-        return next();
-    }
-
     const { decoded, expired } = verifyJwt(accessToken);
 
     if (decoded) {
@@ -26,7 +22,7 @@ const deserializeUser = async (
         return next();
     }
 
-    if (expired && refreshToken) {
+    if (refreshToken) {
         const newAccessToken = await reIssueAccessToken({ refreshToken });
 
         if (newAccessToken === false) return next();
